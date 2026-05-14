@@ -1,0 +1,256 @@
+<!DOCTYPE html>  
+<html lang="fr">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Calcul Moyenne</title>  
+
+<style>  
+body {  
+    font-family: Arial;  
+    text-align: center;  
+    background-color: #f4f4f9;  
+}  
+  
+/* CONTENEUR */  
+.container {  
+    max-width: 400px;  
+    margin: auto;  
+}  
+  
+/* INPUT */  
+input {  
+    padding: 10px;  
+    margin: 5px;  
+    border-radius: 6px;  
+    border: 1px solid #ccc;  
+    width: 100%;  
+}  
+  
+/* LIGNES */  
+.row {  
+    display: flex;  
+    gap: 10px;  
+    justify-content: center;  
+}  
+  
+.row input {  
+    flex: 1;  
+}  
+  
+/* INTERROS */  
+.interros {  
+    display: flex;  
+    justify-content: space-between;  
+    gap: 40px;  
+}  
+  
+.interro-box {  
+    flex: 1;  
+    text-align: center;  
+}  
+  
+/* BOUTONS */  
+button {  
+    margin: 10px;  
+    padding: 10px;  
+    border-radius: 6px;  
+    border: none;  
+    background: #4CAF50;  
+    color: white;  
+    cursor: pointer;  
+}  
+  
+button:hover {  
+    background: #45a049;  
+}  
+  
+#resultat {  
+    margin-top: 20px;  
+    font-weight: bold;  
+}  
+</style>  
+
+</head>  
+
+<body>  
+
+<div class="container">  
+
+<h2>Calcul de Moyenne</h2>  
+
+<!-- COEF + N -->  
+<div class="row">  
+    <input type="number" id="coef" placeholder="Coefficient">  
+    <input type="number" id="n" placeholder="Nbre d'interros" min="2" max="4">  
+</div>  
+
+<button onclick="afficherChampsInterros()">Soumettre</button>
+
+<!-- INTERROS -->  
+<div id="interros" class="interros"></div>  
+
+<!-- SOMME + MOYENNE INTERROS -->  
+<div class="row">  
+    <input type="number" id="sommeInterros" placeholder="Somme interros">  
+    <input type="number" id="moyenneInterros" placeholder="Moy interros">  
+</div>  
+
+<!-- DEVOIRS -->  
+<input type="number" id="d1" placeholder="1er devoir">  
+
+<input type="number" id="d2" placeholder="2e devoir">  
+
+<input type="number" id="sommeDevoirs" placeholder="Somme devoirs">  
+
+<button onclick="calculerMoyenne()">Calculer</button>
+
+<div id="resultat"></div>  
+
+<button onclick="reinitialiserChamps()">Réinitialiser</button>
+
+<br>
+
+<button onclick="window.location.href='rang.html'">
+    Retour
+</button>
+
+</div>  
+
+<script>  
+  
+function afficherChampsInterros() {  
+    let n = parseInt(document.getElementById("n").value);  
+    let div = document.getElementById("interros");  
+    div.innerHTML = "";  
+  
+    for (let i = 1; i <= n; i++) {  
+        div.innerHTML += `  
+        <div class="interro-box">  
+            <div>Int${i}</div>  
+            <input type="number" id="i${i}">  
+        </div>  
+        `;  
+    }  
+}  
+  
+function calculerMoyenne() {  
+    let n = parseInt(document.getElementById("n").value);  
+    let coef = parseFloat(document.getElementById("coef").value);  
+  
+    let moyenneInterros = parseFloat(document.getElementById("moyenneInterros").value);  
+    let sommeInterrosInput = parseFloat(document.getElementById("sommeInterros").value);  
+  
+    let sommeDevoirsInput = parseFloat(document.getElementById("sommeDevoirs").value);  
+    let d1 = parseFloat(document.getElementById("d1").value);  
+    let d2 = parseFloat(document.getElementById("d2").value);  
+  
+    let sommeInterros = 0;  
+    let validInputs = 0;  
+  
+    // INTERROS  
+    if (!isNaN(sommeInterrosInput)) {  
+        moyenneInterros = sommeInterrosInput / n;  
+    }  
+    else if (!isNaN(moyenneInterros)) {  
+        // ok  
+    }  
+    else {  
+        for (let i = 1; i <= n; i++) {  
+            let val = parseFloat(document.getElementById(`i${i}`).value);  
+            if (!isNaN(val)) {  
+                sommeInterros += val;  
+                validInputs++;  
+            }  
+        }  
+        moyenneInterros = sommeInterros / validInputs;  
+    }  
+  
+// DEVOIRS
+let sommeDevoirs;
+let moyenneSemestre;
+
+if (!isNaN(sommeDevoirsInput)) {
+
+    // Cas : somme devoirs saisie
+    sommeDevoirs = sommeDevoirsInput;
+
+    moyenneSemestre = (moyenneInterros + sommeDevoirs) / 3;
+
+}
+else if (!isNaN(d1) && !isNaN(d2)) {
+
+    // Cas : deux devoirs
+    sommeDevoirs = d1 + d2;
+
+    moyenneSemestre = (moyenneInterros + sommeDevoirs) / 3;
+
+}
+else if (!isNaN(d1)) {
+
+    // Cas : un seul devoir
+    sommeDevoirs = d1;
+
+    moyenneSemestre = (moyenneInterros + d1) / 2;
+
+}
+else {
+
+    document.getElementById("resultat").innerHTML = "Erreur : Devoir(s) manquant(s)";
+    return;
+
+}
+
+// MOYENNE COEF
+let moyenneCoef = moyenneSemestre * coef;
+
+document.getElementById("resultat").innerHTML = `
+Moyenne Interros: ${moyenneInterros.toFixed(2)}<br>
+Moyenne Semestrielle: ${moyenneSemestre.toFixed(2)}<br>
+Moyenne Coef: ${moyenneCoef.toFixed(2)}
+`;
+}
+  
+function reinitialiserChamps() {
+
+    // Nombre d'interros actuel
+    let n = parseInt(document.getElementById("n").value);
+
+    // Vider uniquement les champs des interros
+    for (let i = 1; i <= n; i++) {
+        let input = document.getElementById(`i${i}`);
+        if (input) {
+            input.value = "";
+        }
+    }
+
+    // Vider les autres champs
+    document.getElementById("sommeInterros").value = "";
+    document.getElementById("moyenneInterros").value = "";
+
+    document.getElementById("d1").value = "";
+    document.getElementById("d2").value = "";
+
+    document.getElementById("sommeDevoirs").value = "";
+
+    // Effacer le résultat
+    document.getElementById("resultat").innerHTML = "";
+
+}
+
+// Gestion du bouton retour Android
+window.addEventListener("popstate", function () {
+    window.location.href = "rang.html";
+});
+
+// Empêche fermeture brutale
+history.pushState(null, null, location.href);
+  history.pushState(null, null, location.href);
+
+window.onpopstate = function () {
+    window.location.href = "rang.html";
+};
+</script>  
+
+</body>  
+</html>

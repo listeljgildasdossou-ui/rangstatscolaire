@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Blanche</title>
+    <style>
+        body {
+            background-color: white;
+            color: Blue;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 30kpx;
+            margin: 0;
+        }
+
+        /* Icône de menu */
+        .menu-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        /* Fenêtre coulissante */
+        .slide-window {
+            position: fixed;
+            top: 0;
+            left: -300px; /* Fenêtre cachée à gauche */
+            width: 290px;
+            height: 100%;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: left 0.3s ease-in-out;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 1;
+        }
+
+
+        /* Style du texte dans la fenêtre */
+        .slide-window a {
+            display: block;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: left;
+            text-decoration: none;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .slide-window a:hover {
+            color: blue;
+        }
+        img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+    </style>
+</head>
+<body>
+    <div class="menu-icon" onclick="toggleWindow()">&#9776;</div> <!-- Icône de menu -->
+    
+    <div class="slide-window" id="menuWindow">
+      
+        <a href="calcmm.html">📟 Calcul de moyennes par matière</a>
+        <a href="calcms.html">📟 Calcul de moyennes semestrielles/annuelles</a>
+        <a href="stat.html">📊 Rangs & Statistiques</a>
+        <a href="confid.html">📦 Politique et confidentialité</a>
+    </div>
+
+    <h2>Bienvenue dans </h2>
+    <h2>Rang & Statistique</h2>
+    <img src="rang_stat.jpg" alt="Rang et Statistique" width="300"> <!-- Ajout de l'image -->
+
+    <script>
+    function toggleWindow() {
+        const menuWindow = document.getElementById('menuWindow');
+        if (menuWindow.style.left === '0px') {
+            menuWindow.style.left = '-300px';
+        } else {
+            menuWindow.style.left = '0px';
+        }
+    }
+
+    let startX = 0;
+    let startY = 0;
+    let endX = 0;
+    let endY = 0;
+
+    const menuWindow = document.getElementById('menuWindow');
+
+    menuWindow.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    });
+
+    menuWindow.addEventListener('touchmove', function(e) {
+        endX = e.touches[0].clientX;
+        endY = e.touches[0].clientY;
+    });
+
+    menuWindow.addEventListener('touchend', function() {
+        let diffX = startX - endX;
+        let diffY = Math.abs(startY - endY);
+
+        // Swipe vers la gauche tolérant (même si légèrement diagonal)
+        if (diffX > 40 && diffY < 100) {
+            menuWindow.style.left = '-300px';
+        }
+    });
+</script>
+</body>
+</html>

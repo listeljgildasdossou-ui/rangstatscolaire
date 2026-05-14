@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcul de moyenne Semestre/Annuelle</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 15px auto;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+        }
+
+        input, button {
+            margin: 3px;
+            padding: 6px;
+            font-size: 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        input[type="number"] {
+            width: 80px;
+        }
+
+        label {
+            font-size: 14px;
+            display: inline-block;
+            width: auto;
+            text-align: left;
+            margin-right: 5px;
+        }
+
+        button {
+            background: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background: darkgreen;
+        }
+
+        .ligne-saisie {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 3px 0;
+        }
+
+        .ligne-saisie input {
+            width: 90px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        #resultats {
+            display: none;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            margin-top: 15px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h3>Calcul de moyenne Semestre/Annuelle</h3>
+
+    <div class="form-group">
+        <label for="nbMatieres">Nombre de matières :</label>
+
+        <input type="number" id="nbMatieres" min="1" required>
+
+        <button onclick="genererSaisie()">Valider</button>
+    </div>
+
+    <div class="form-group">
+        <label for="totalCoeff">Total Coeff :</label>
+
+        <input type="number" id="totalCoeff" min="1" required>
+    </div>
+    <div id="saisieNotes"></div>
+    <div id="boutonsActions" style="display: none;">
+
+    <button onclick="calculerMoyenne()">
+        Calculer
+    </button>
+
+    <button onclick="reinitialiserMoyennes()">
+        Réinitialiser
+    </button>
+
+</div>
+
+    <div id="resultats" style="display: none;">
+
+        <h3>Résultats</h3>
+
+        <p id="total"></p>
+
+        <p id="moyenneSem"></p>
+
+        <div class="form-group">
+
+            <input
+                type="number"
+                id="moy1erSem"
+                step="0.001"
+                min="0"
+                max="20"
+                placeholder="Moyenne du 1er semestre"
+            >
+        </div>
+
+        <button onclick="calculerMoyenneGenerale()">
+            Calculer Moyenne Générale
+        </button>
+
+        <p id="moyenneGenerale" style="display: none;"></p>
+
+    </div>
+
+    <div>
+        <button onclick="window.location.href='rang.html'">
+            Retour
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+function genererSaisie() {
+
+    let nbMatieres = document.getElementById("nbMatieres").value;
+
+    let saisieNotes = document.getElementById("saisieNotes");
+
+    saisieNotes.innerHTML = "";
+
+    if (nbMatieres > 0) {
+
+        for (let i = 1; i <= nbMatieres; i++) {
+
+            let nomMatiere =
+                i === parseInt(nbMatieres)
+                ? "Conduite"
+                : `Moyenne ${i}`;
+
+            let ligne = document.createElement("div");
+
+            ligne.classList.add("ligne-saisie");
+
+            let input = document.createElement("input");
+
+            input.type = "number";
+
+            input.min = "0";
+
+            input.max = "120";
+
+            input.step = "0.001";
+
+            input.placeholder = nomMatiere;
+
+            input.classList.add("note");
+
+            ligne.appendChild(input);
+
+            saisieNotes.appendChild(ligne);
+        }
+
+        document.getElementById("boutonsActions").style.display = "block";
+
+    } else {
+
+        alert("Veuillez entrer un nombre valide !");
+    }
+}
+
+function calculerMoyenne() {
+
+    let notes = document.querySelectorAll(".note");
+
+    let totalCoeff =
+        parseFloat(document.getElementById("totalCoeff").value);
+
+    if (isNaN(totalCoeff) || totalCoeff <= 0) {
+
+        alert("Veuillez entrer un total des coefficients valide !");
+
+        return;
+    }
+
+    let total = 0;
+
+    for (let note of notes) {
+
+        let valeur = parseFloat(note.value);
+
+        if (isNaN(valeur) || valeur < 0 || valeur > 120) {
+
+            alert("Veuillez entrer des notes valides entre 0 et 120.");
+
+            return;
+        }
+
+        total += valeur;
+    }
+
+    let moyenneSem = total / totalCoeff;
+
+    document.getElementById("total").innerText =
+        `Total : ${total.toFixed(3)}`;
+
+    document.getElementById("moyenneSem").innerText =
+        `Moyenne semestrielle : ${moyenneSem.toFixed(3)}`;
+
+    document.getElementById("resultats").style.display = "block";
+}
+
+function calculerMoyenneGenerale() {
+
+    let moy1erSem =
+        parseFloat(document.getElementById("moy1erSem").value);
+
+    let moySem =
+        parseFloat(
+            document
+            .getElementById("moyenneSem")
+            .innerText
+            .split(": ")[1]
+        );
+
+    if (!isNaN(moy1erSem)) {
+
+        let moyGenerale =
+            (moy1erSem + 2 * moySem) / 3;
+
+        document.getElementById("moyenneGenerale").innerText =
+            `Moyenne générale : ${moyGenerale.toFixed(3)}`;
+
+        document.getElementById("moyenneGenerale").style.display = "block";
+
+    } else {
+
+        document.getElementById("moyenneGenerale").style.display = "none";
+    }
+}
+function reinitialiserMoyennes() {
+
+    // Vider les champs des notes
+    let notes = document.querySelectorAll(".note");
+
+    notes.forEach(note => {
+        note.value = "";
+    });
+
+    // Effacer les résultats
+    document.getElementById("total").innerText = "";
+
+    document.getElementById("moyenneSem").innerText = "";
+
+    document.getElementById("moyenneGenerale").innerText = "";
+
+    document.getElementById("moyenneGenerale").style.display = "none";
+
+    document.getElementById("resultats").style.display = "none";
+
+    // Vider moyenne 1er semestre
+    document.getElementById("moy1erSem").value = "";
+
+}
+</script>
+
+</body>
+</html>
