@@ -111,7 +111,7 @@ button:hover {
 
 <br>
 
-<button onclick="window.location.href='rang.html'">
+<button onclick="window.location.href='index.html'">
     Retour
 </button>
 
@@ -240,7 +240,7 @@ function reinitialiserChamps() {
 
 // Gestion du bouton retour Android
 window.addEventListener("popstate", function () {
-    window.location.href = "rang.html";
+    window.location.href = "index.html";
 });
 
 // Empêche fermeture brutale
@@ -248,7 +248,7 @@ history.pushState(null, null, location.href);
   history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
-    window.location.href = "rang.html";
+    window.location.href = "index.html";
 };
 </script>  
 
