@@ -78,11 +78,11 @@
             align-items: center;
             gap: 10px;
         }
-        /* Style pour la fenêtre coulissante */
+
         #sliding-window {
             position: fixed;
             top: 0;
-            left: -300px; /* Commence en dehors de l'écran */
+            left: -300px;
             width: 300px;
             height: 100%;
             background-color: #fff;
@@ -90,9 +90,11 @@
             transition: left 0.3s ease;
             z-index: 1000;
         }
+
         #sliding-window.active {
-            left: 0; /* Se déplace à l'intérieur de l'écran */
+            left: 0;
         }
+
         .close-button {
             background: none;
             border: none;
@@ -102,17 +104,19 @@
             left: 10px;
             cursor: pointer;
         }
+
         .menu-icon {
             position: absolute;
             top: 10px;
             left: 10px;
             cursor: pointer;
-            width: 30px; /* Ajustez la taille selon l'icône */
-            height: 30px; /* Ajustez la taille selon l'icône */
+            width: 30px;
+            height: 30px;
             background: url('https://spc.unk/Mz1mtHxiWDfAAv5a1BoFzDnw') no-repeat center center;
             background-size: contain;
         }
     </style>
+
     <script>
         let apprenants = [];
 
@@ -123,10 +127,12 @@
 
         function saisirNombres() {
             const effectif = parseInt(document.getElementById("effectif").value);
+
             if (isNaN(effectif) || effectif <= 0) {
                 alert("Veuillez entrer un effectif valide.");
                 return;
             }
+
             apprenants = new Array(effectif).fill(null);
             afficherSaisieNombres();
         }
@@ -134,20 +140,25 @@
         function afficherSaisieNombres() {
             const inputContainer = document.getElementById("input-container");
             inputContainer.innerHTML = "";
+
             for (let i = 0; i < apprenants.length; i++) {
                 inputContainer.innerHTML += `
                     <div class="input-row">
                         <label>Sexe:</label>
+
                         <select id="sexe-${i}" onchange="mettreAJourMoyenne(${i})">
                             <option value="">Sélectionner</option>
                             <option value="Garçon">Garçon</option>
                             <option value="Fille">Fille</option>
                         </select>
+
                         <label>Moyenne #${i + 1}:</label>
+
                         <input type="number" step="0.01" id="moyenne-${i}" onchange="mettreAJourMoyenne(${i})">
                     </div>
                 `;
             }
+
             document.getElementById("validerNombres").style.display = "block";
         }
 
@@ -161,24 +172,102 @@
         }
 
         function afficherTrie() {
+
             if (apprenants.some(n => n === null)) {
                 alert("Veuillez saisir toutes les moyennes et les sexes avant de continuer.");
                 return;
             }
+
             const triés = [...apprenants].sort((a, b) => b.moyenne - a.moyenne);
 
-            let resultat = "<h2>Moyennes Triées</h2><table><tr><th>Moyenne</th><th>Sexe</th><th>Rang</th></tr>";
+            let resultat = `
+                <h2>Moyennes Triées</h2>
+
+                <table>
+                    <tr>
+                        <th>Moyenne</th>
+                        <th>Sexe</th>
+                        <th>Rang</th>
+                    </tr>
+            `;
+
             for (let i = 0; i < triés.length; i++) {
+
                 const rang = (i === 0) ? "1er" : `${i + 1}ème`;
-                resultat += `<tr><td>${triés[i].moyenne}</td><td>${triés[i].sexe}</td><td>${rang}</td></tr>`;
+
+                resultat += `
+                    <tr>
+                        <td>${triés[i].moyenne}</td>
+                        <td>${triés[i].sexe}</td>
+                        <td>${rang}</td>
+                    </tr>
+                `;
             }
-            resultat += "</table>";
+
+            resultat += `
+                </table>
+
+                <br><br>
+
+                <h3>Rechercher un apprenant</h3>
+
+                <label>Entrer la moyenne :</label>
+
+                <input type="number" step="0.01" id="recherche-moyenne">
+
+                <button onclick="rechercherApprenant()">Rechercher</button>
+
+                <div id="resultat-recherche" style="margin-top:10px;"></div>
+            `;
 
             document.getElementById("resultat2").innerHTML = resultat;
+
             showPage('page2');
         }
 
+                function rechercherApprenant() {
+
+            const moyenneRecherchee = parseFloat(
+                document.getElementById("recherche-moyenne").value
+            );
+
+            if (isNaN(moyenneRecherchee)) {
+                alert("Veuillez entrer une moyenne valide.");
+                return;
+            }
+
+            const tries = [...apprenants].sort((a, b) => b.moyenne - a.moyenne);
+
+            let resultats = "";
+
+            for (let i = 0; i < tries.length; i++) {
+
+                if (tries[i].moyenne === moyenneRecherchee) {
+
+                    const rang = (i === 0) ? "1er" : `${i + 1}ème`;
+
+                    resultats += `
+                        <div style="margin-bottom:10px; padding:8px; border:1px solid #ccc; border-radius:5px;">
+                            <strong>Rang :</strong> ${rang}<br>
+                            <strong>Sexe :</strong> ${tries[i].sexe}<br>
+                            <strong>Moyenne :</strong> ${tries[i].moyenne}
+                        </div>
+                    `;
+                }
+            }
+
+            if (resultats === "") {
+
+                document.getElementById("resultat-recherche").innerHTML =
+                    "Aucun apprenant trouvé avec cette moyenne.";
+
+            } else {
+
+                document.getElementById("resultat-recherche").innerHTML = resultats;
+            }
+        }
         function afficherIntervalles() {
+
             const intervalles = {
                 "Moyennes < 6,5": { total: 0, garçons: 0, filles: 0 },
                 "6,5 ≤ Moyennes < 7,5": { total: 0, garçons: 0, filles: 0 },
@@ -191,58 +280,117 @@
                 "Moyennes ≥ 16": { total: 0, garçons: 0, filles: 0 },
                 "Moyennes ≥ 10": { total: 0, garçons: 0, filles: 0 }
             };
-                
 
             apprenants.forEach(({ moyenne, sexe }) => {
 
-    // Moyennes >= 10
                 if (moyenne >= 10) {
+                    intervalles["Moyennes ≥ 10"].total++;
 
-        intervalles["Moyennes ≥ 10"].total++;
+                    sexe === "Garçon"
+                        ? intervalles["Moyennes ≥ 10"].garçons++
+                        : intervalles["Moyennes ≥ 10"].filles++;
+                }
 
-        sexe === "Garçon"
-            ? intervalles["Moyennes ≥ 10"].garçons++
-            : intervalles["Moyennes ≥ 10"].filles++;
-    }
-
-    // autres intervalles
                 if (moyenne < 6.5) {
                     intervalles["Moyennes < 6,5"].total++;
-                    sexe === "Garçon" ? intervalles["Moyennes < 6,5"].garçons++ : intervalles["Moyennes < 6,5"].filles++;
+                    sexe === "Garçon"
+                        ? intervalles["Moyennes < 6,5"].garçons++
+                        : intervalles["Moyennes < 6,5"].filles++;
+
                 } else if (moyenne >= 6.5 && moyenne < 7.5) {
+
                     intervalles["6,5 ≤ Moyennes < 7,5"].total++;
-                    sexe === "Garçon" ? intervalles["6,5 ≤ Moyennes < 7,5"].garçons++ : intervalles["6,5 ≤ Moyennes < 7,5"].filles++;
+
+                    sexe === "Garçon"
+                        ? intervalles["6,5 ≤ Moyennes < 7,5"].garçons++
+                        : intervalles["6,5 ≤ Moyennes < 7,5"].filles++;
+
                 } else if (moyenne >= 7.5 && moyenne < 8.5) {
+
                     intervalles["7,5 ≤ Moyennes < 8,5"].total++;
-                    sexe === "Garçon" ? intervalles["7,5 ≤ Moyennes < 8,5"].garçons++ : intervalles["7,5 ≤ Moyennes < 8,5"].filles++;
+
+                    sexe === "Garçon"
+                        ? intervalles["7,5 ≤ Moyennes < 8,5"].garçons++
+                        : intervalles["7,5 ≤ Moyennes < 8,5"].filles++;
+
                 } else if (moyenne >= 8.5 && moyenne < 9) {
+
                     intervalles["8,5 ≤ Moyennes < 9"].total++;
-                    sexe === "Garçon" ? intervalles["8,5 ≤ Moyennes < 9"].garçons++ : intervalles["8,5 ≤ Moyennes < 9"].filles++;
+
+                    sexe === "Garçon"
+                        ? intervalles["8,5 ≤ Moyennes < 9"].garçons++
+                        : intervalles["8,5 ≤ Moyennes < 9"].filles++;
+
                 } else if (moyenne >= 9 && moyenne < 10) {
+
                     intervalles["9 ≤ Moyennes < 10"].total++;
-                    sexe === "Garçon" ? intervalles["9 ≤ Moyennes < 10"].garçons++ : intervalles["9 ≤ Moyennes < 10"].filles++;
+
+                    sexe === "Garçon"
+                        ? intervalles["9 ≤ Moyennes < 10"].garçons++
+                        : intervalles["9 ≤ Moyennes < 10"].filles++;
+
                 } else if (moyenne >= 10 && moyenne < 12) {
+
                     intervalles["10 ≤ Moyennes < 12"].total++;
-                    sexe === "Garçon" ? intervalles["10 ≤ Moyennes < 12"].garçons++ : intervalles["10 ≤ Moyennes < 12"].filles++;
+
+                    sexe === "Garçon"
+                        ? intervalles["10 ≤ Moyennes < 12"].garçons++
+                        : intervalles["10 ≤ Moyennes < 12"].filles++;
+
                 } else if (moyenne >= 12 && moyenne < 14) {
+
                     intervalles["12 ≤ Moyennes < 14"].total++;
-                    sexe === "Garçon" ? intervalles["12 ≤ Moyennes < 14"].garçons++ : intervalles["12 ≤ Moyennes < 14"].filles++;
+
+                    sexe === "Garçon"
+                        ? intervalles["12 ≤ Moyennes < 14"].garçons++
+                        : intervalles["12 ≤ Moyennes < 14"].filles++;
+
                 } else if (moyenne >= 14 && moyenne < 16) {
+
                     intervalles["14 ≤ Moyennes < 16"].total++;
-                    sexe === "Garçon" ? intervalles["14 ≤ Moyennes < 16"].garçons++ : intervalles["14 ≤ Moyennes < 16"].filles++;
+
+                    sexe === "Garçon"
+                        ? intervalles["14 ≤ Moyennes < 16"].garçons++
+                        : intervalles["14 ≤ Moyennes < 16"].filles++;
+
                 } else if (moyenne >= 16) {
+
                     intervalles["Moyennes ≥ 16"].total++;
-                    sexe === "Garçon" ? intervalles["Moyennes ≥ 16"].garçons++ : intervalles["Moyennes ≥ 16"].filles++;
-                } 
+
+                    sexe === "Garçon"
+                        ? intervalles["Moyennes ≥ 16"].garçons++
+                        : intervalles["Moyennes ≥ 16"].filles++;
+                }
             });
 
-            let resultatIntervalles = "<h2>Répartition des Moyennes</h2><table><tr><th>Intervalle</th><th>Garçons</th><th>Filles</th><th>Total</th></tr>";
+            let resultatIntervalles = `
+                <h2>Répartition des Moyennes</h2>
+
+                <table>
+                    <tr>
+                        <th>Intervalle</th>
+                        <th>Garçons</th>
+                        <th>Filles</th>
+                        <th>Total</th>
+                    </tr>
+            `;
+
             for (const [intervalle, valeurs] of Object.entries(intervalles)) {
-                resultatIntervalles += `<tr><td>${intervalle}</td><td>${valeurs.garçons}</td><td>${valeurs.filles}</td><td>${valeurs.total}</td></tr>`;
+
+                resultatIntervalles += `
+                    <tr>
+                        <td>${intervalle}</td>
+                        <td>${valeurs.garçons}</td>
+                        <td>${valeurs.filles}</td>
+                        <td>${valeurs.total}</td>
+                    </tr>
+                `;
             }
+
             resultatIntervalles += "</table>";
 
             document.getElementById("resultat-intervalles").innerHTML = resultatIntervalles;
+
             showPage('page3');
         }
 
@@ -259,36 +407,61 @@
         };
     </script>
 </head>
+
 <body>
+
     <div class="menu-icon" onclick="toggleSlidingWindow()"></div>
 
     <div id="sliding-window">
+
         <button class="close-button" onclick="toggleSlidingWindow()">✖</button>
+
         <h2>Informations Supplémentaires</h2>
-        <p>Cette fenêtre coulissante peut contenir des informations supplémentaires ou des instructions.</p>
+
+        <p>
+            Cette fenêtre coulissante peut contenir des informations supplémentaires ou des instructions.
+        </p>
+
     </div>
 
     <div id="page1" class="page">
+
         <h1>Saisie des Moyennes</h1>
+
         <label for="effectif">Entrer l'effectif :</label>
+
         <input type="number" id="effectif" min="1" required>
+
         <button onclick="saisirNombres()">Soumettre</button>
+
         <div id="input-container"></div>
-        <button id="validerNombres" style="display:none;" onclick="afficherTrie()">Afficher Moyennes Triées</button>
+
+        <button id="validerNombres" style="display:none;" onclick="afficherTrie()">
+            Afficher Moyennes Triées
+        </button>
+
         <button onclick="window.location.href='index.html'">Retour</button>
+
     </div>
 
     <div id="page2" class="page">
-        <h1>Moyennes Triées</h1>
+
         <div id="resultat2" class="result-container"></div>
+
         <button onclick="afficherIntervalles()">Afficher Répartition</button>
+
         <button onclick="retourner('page1')">Retour</button>
+
     </div>
 
     <div id="page3" class="page">
-        <h1>Répartition des Moyennes</h1>
+
+
         <div id="resultat-intervalles" class="result-container"></div>
+
         <button onclick="retourner('page2')">Retour</button>
+
     </div>
+
 </body>
 </html>
